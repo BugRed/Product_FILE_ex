@@ -6,6 +6,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -15,7 +16,7 @@ import entities.Product;
 
 public class Program {
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws ParseException {
 
 		Locale.setDefault(Locale.US);
 		Scanner sc = new Scanner(System.in);
@@ -36,38 +37,24 @@ public class Program {
 
 			String line = br.readLine();
 			while (line != null) {
+
 				String[] vect = line.split(",");
-
-				Product product = new Product(vect[0], Double.parseDouble(vect[1]), Integer.parseInt(vect[2]));
-
-				listProduct.add(product);
+				listProduct.add(new Product(vect[0], Double.parseDouble(vect[1]), Integer.parseInt(vect[2])));
 
 				line = br.readLine();
+
+			} try (BufferedWriter bw = new BufferedWriter(new FileWriter(targetFile))) {
+				for (Product product : listProduct) {
+
+					bw.write(product.getName() + "," + String.format("%.2f%n", product.totalPrice()));
+					bw.newLine();
+				}
+			} catch (IOException e) {
+				System.out.println("Error: " + e.getMessage());
 			}
-
-			System.out.println("PRODUCTS: ");
-			for (Product p : listProduct) {
-				System.out.println(p + "Total price " + p.totalPrice());
-			}
-
-		}
-
-		catch (IOException e) {
-			System.out.println("Error: " + e.getMessage());
-
-		}
-		try (BufferedWriter bw = new BufferedWriter(new FileWriter(targetFile))) {
-			for (Product product : listProduct) {
-
-				bw.write(product.getName());
-				// bw.write(product.getPrice());
-				bw.write(product.getQuantity());
-				// bw.write(product.totalPrice());
-				bw.newLine();
-			}
-
 		} catch (IOException e) {
 			System.out.println("Error: " + e.getMessage());
+
 		}
 
 	}
